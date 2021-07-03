@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Big Weg</title>
+	<link rel="shortcut icon" type="image/png" href="favicon.png"/>
+	<meta charset="utf-8">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+	<script src="https://use.fontawesome.com/releases/v5.5.0/js/all.js"></script>
+	<script type="module" crossorigin>
+		const init = async () => {
+
+			// get image URLs from backend service
+			const getImageUrls = async () => {
+				let res = await fetch('/refresh', {method: 'POST'})
+				res = await res.json()
+				return res.files
+			}
+
+			// dynamic add big weg images :)
+			const addElements = async () => {
+				const container = document.getElementById('content')
+				const images = await getImageUrls()
+				for (let [index, image] of images.entries()) {
+					let card = document.createElement('div')
+					let img = document.createElement('img')
+
+					card.setAttribute('class', 'card border-0')
+					img.setAttribute('src', image)
+					img.setAttribute('class', 'weg-img card-img')
+					img.setAttribute('alt', `Dynamically created big weg image ${index}`)
+
+					card.appendChild(img)
+					container.appendChild(card)
+				}
+			}
+
+			await addElements()
+			document.getElementById('loading-text').style.display = 'none'
+		}
+		window.onload = init
+	</script>
+	<style>
+		* {
+			color: #FCFCFC;
+		}
+
+		body {
+			background-color: #2F242C;
+		}
+
+		#loading-text {
+			color: gray;
+			font-style: italic;
+		}
+
+		#intro {
+			position: relative;
+			z-index: 20;
+			top: 8rem;
+			display: table;
+			margin: 0 auto;
+			width: 75%;
+			max-width: 75%;
+			padding-bottom: 2rem;
+		}
+
+		#main {
+			position: relative;
+			z-index: 20;
+			top: 8rem;
+			display: table;
+			margin: 0 auto;
+			width: 75%;
+			max-width: 75%;
+		}
+
+		.weg-img {
+			display: block;
+			max-width: 21rem;
+			max-height: 28rem;
+			width: auto;
+			height: auto;
+			margin: auto;
+		}
+
+		.card {
+			background-color: #2F242C;
+		}
+
+		@media (min-width: 48rem) {
+			.card-columns {
+				-webkit-column-count: 2;
+				-moz-column-count: 2;
+				column-count: 2;
+			}
+
+			#main {
+				width: 95%;
+				max-width: 95%;
+			}
+		}
+
+		@media (min-width: 62rem) {
+			.card-columns {
+				-webkit-column-count: 3;
+				-moz-column-count: 3;
+				column-count: 3;
+			}
+
+			#main {
+				width: 75% !important;
+				max-width: 75% !important;
+			}
+		}
+
+		@media (min-width: 75rem) {
+			.card-columns {
+				-webkit-column-count: 4;
+				-moz-column-count: 4;
+				column-count: 4;
+			}
+
+			#main {
+				width: 75%;
+				max-width: 75%;
+			}
+		}
+	</style>
+</head>
+<body>
+	<div id="intro">
+		<h1>Big Weg</h1>
+		<p>Reggie (a.k.a. <i>Big Weg</i>) is a dog like no other - a source of smiles, a confidant, a hungry boi, and (most importantly) a friend. It has been a privilege to provide for and go through life with a friend like Big Weg, and we are all forever thankful for his presence the last 16 years. From binging on Scooby Doo fruit snacks, to lounging with us throughout beautiful Oregon summers, we couldn't have asked for a better friend. Oh, the stories you could tell, Reggie. We love you so, so much. Here is just a sliver of the memories we've been lucky to share with you. We hope you're running free in your forever pasture.</p>
+		<p id="loading-text"><i class="fas fa-circle-notch fa-spin"></i> Loading the latest and greatest of Big Weg, one second please...</p>
+	</div>
+	<div id="main">
+		<div class="row">
+			<div id="content" class="card-columns"></div>
+		</div>
+	</div>
+	<div id="bottom"></div>
+</body>
+</html>

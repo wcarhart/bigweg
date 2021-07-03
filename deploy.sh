@@ -21,7 +21,7 @@ After=network-online.target
 
 [Service]
 Environment="PATH=${NVM_BIN}:$PATH"
-ExecStart=${NVM_BIN}/node ${PWD}/${APP}/index.mjs
+ExecStart=${NVM_BIN}/node ${PWD}/${APP}/index.js
 Restart=always
 RestartSec=10
 StandardOutput=syslog

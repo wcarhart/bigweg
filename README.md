@@ -4,8 +4,7 @@ Memorial site for Reggie.
 ### Deploy
 Simple Express app deployed via DigitalOcean. To deploy:
 ```bash
-source setup.sh
-./deploy.sh
+TBD
 ```
 
 ### About

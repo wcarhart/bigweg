@@ -26,7 +26,7 @@ const googleDrive = (opts) => {
 	router.post('/', async (req, res, next) => {
 		// first, list files in public Drive folder
 		let images = []
-		const localFiles = await readdirPromise('images')
+		const localFiles = await readdirPromise(path.join(__dirname, 'images'))
 		try {
 			let response = await drive.files.list({q: `'${BIG_WEG_FOLDER_ID}' in parents`})
 			images = response.data.files
@@ -46,7 +46,7 @@ const googleDrive = (opts) => {
 					console.log(`Cached ${image.name} (${image.id})`)
 					continue
 				}
-				let dest = fs.createWriteStream(path.join('images', `${image.name}`))
+				let dest = fs.createWriteStream(path.join(__dirname, 'images', `${image.name}`))
 				try {
 					let retries = 3
 					while (retries > 0) {
@@ -61,7 +61,7 @@ const googleDrive = (opts) => {
 							)
 						})
 
-						let stats = await statPromise(path.join('images', `${image.name}`))
+						let stats = await statPromise(path.join(__dirname, 'images', `${image.name}`))
 						if (stats.size === 0) {
 							retries -= 1
 						} else {
@@ -90,7 +90,7 @@ const googleDrive = (opts) => {
 		for (let f of localFiles) {
 			if (!cloudFiles.includes(f)) {
 				console.log(`Removing ${f}`)
-				await rmPromise(path.join('images', f))
+				await rmPromise(path.join(__dirname, 'images', f))
 			}
 		}
 

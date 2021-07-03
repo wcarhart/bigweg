@@ -34,7 +34,7 @@ app.use((req, res, next) => {
 app.use(routeLogger())
 
 // serve static image files
-app.use(`/images`, express.static('images'))
+app.use(`/images`, express.static(path.join(__dirname, 'images')))
 
 // serve UI
 app.get('/', express.static(path.join(__dirname, 'public')))

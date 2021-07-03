@@ -1,3 +1,6 @@
+const crypto = require('crypto')
+const http = require('http')
+const https = require('https')
 const path = require('path')
 const fs = require('fs')
 
@@ -8,6 +11,13 @@ const { google } = require('googleapis')
 const gd = require('./googledrive.js')
 
 const PORT = 80
+
+const privateKey = fs.readFileSync('privatekey.pem').toString()
+const certificate = fs.readFileSync('certificate.pem').toString()
+let options = {
+  key: privateKey,
+  cert: certificate
+}
 
 // configure express app
 const app = express()
@@ -50,6 +60,11 @@ app.use((err, req, res, next) => {
 })
 
 // start app
-app.listen(PORT, '0.0.0.0', () => {
-	console.log(`port: ${PORT}`)
-})
+// DEV
+// app.listen(PORT, '0.0.0.0', () => {
+// 	console.log(`port: ${PORT}`)
+// })
+
+// PROD
+http.createServer(app).listen(80)
+https.createServer(options, app).listen(443)

@@ -7,7 +7,6 @@ const { google } = require('googleapis')
 
 const gd = require('./googledrive.js')
 
-const IMG_DIR = 'images'
 const PORT = 80
 
 // configure express app
@@ -35,8 +34,7 @@ app.use((req, res, next) => {
 app.use(routeLogger())
 
 // serve static image files
-// app.use(express.static(path.join(__dirname, IMG_DIR)))
-app.use(`/${IMG_DIR}`, express.static(path.join(__dirname, IMG_DIR)))
+app.use(`/images`, express.static('images'))
 
 // serve UI
 app.get('/', express.static(path.join(__dirname, 'public')))
@@ -53,8 +51,5 @@ app.use((err, req, res, next) => {
 
 // start app
 app.listen(PORT, '0.0.0.0', () => {
-	if (!fs.existsSync(IMG_DIR)){
-		fs.mkdirSync(IMG_DIR);
-	}
 	console.log(`port: ${PORT}`)
 })

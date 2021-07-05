@@ -6,6 +6,7 @@ const fs = require('fs')
 
 const fetch = require('node-fetch')
 const express = require('express')
+const errorHandler = require('errorhandler')
 const { google } = require('googleapis')
 
 const gd = require('./googledrive.js')
@@ -42,6 +43,7 @@ app.use((req, res, next) => {
 
 // log all HTTP routes
 app.use(routeLogger())
+app.use(errorHandler({ dumpExceptions: true, showStack: true }))
 
 // serve static image files
 app.use(`/images`, express.static(path.join(__dirname, 'images')))
@@ -53,7 +55,7 @@ app.get('/favicon.png', express.static(path.join(__dirname, 'public')))
 // download images from Google Drive
 app.use('/refresh', gd())
 
-// log errors
+// log middleware errors
 app.use((err, req, res, next) => {
 	console.error(err)
 	res.json(err)
@@ -62,9 +64,11 @@ app.use((err, req, res, next) => {
 // start app
 // DEV
 // app.listen(PORT, '0.0.0.0', () => {
-// 	console.log(`port: ${PORT}`)
+// 	console.log(`bigweg server listening on port ${PORT}`)
 // })
 
 // PROD
+console.log(`bigweg HTTP server listening on port 80`)
+console.log(`bigweg HTTPS server listening on port 443`)
 http.createServer(app).listen(80)
 https.createServer(options, app).listen(443)

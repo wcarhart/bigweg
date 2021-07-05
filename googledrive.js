@@ -1,14 +1,19 @@
 const express = require('express')
 const fetch = require('node-fetch')
 const { google } = require('googleapis')
+const convert = require('heic-convert')
 const credentials = require('./credentials.json')
 const fs = require('fs')
 const path = require('path')
 const util = require('util')
+const { exec } = require('child_process')
 
 const readdirPromise = util.promisify(fs.readdir)
+const readFilePromise = util.promisify(fs.readFile)
+const writeFilePromise = util.promisify(fs.writeFile)
 const rmPromise = util.promisify(fs.rm)
 const statPromise = util.promisify(fs.stat)
+const execPromise = util.promisify(exec)
 
 const BIG_WEG_FOLDER_ID = '1EnEJ1P2kqEjbFChLvIPRp5FUDRyq-C5A'
 
@@ -38,14 +43,35 @@ const googleDrive = (opts) => {
 			})
 		}
 
+		// set of final assets that we will return
+		let assets = []
+
 		// then, attempt to download files if they don't exist
 		try {
 			for (let image of images) {
 				// if file is already downloaded, use cached version
 				if (localFiles.includes(image.name)) {
 					console.log(`Cached ${image.name} (${image.id})`)
+					assets.push(image.name)
 					continue
 				}
+
+				// check for .gif conversion of .mov files
+				let filename = image.name.split('.').slice(0, -1).join('.')
+				if (localFiles.includes(`${filename}.gif`)) {
+					console.log(`Cached ${filename}.gif (${image.id})`)
+					assets.push(`${filename}.gif`)
+					continue
+				}
+
+				// check for .jpeg conversion of .heic files
+				if (localFiles.includes(`${filename}.jpeg`)) {
+					console.log(`Cached ${filename}.jpeg (${image.id})`)
+					assets.push(`${filename}.jpeg`)
+					continue
+				}
+
+				// attempt to download
 				let dest = fs.createWriteStream(path.join(__dirname, 'images', `${image.name}`))
 				try {
 					let retries = 3
@@ -72,9 +98,10 @@ const googleDrive = (opts) => {
 					if (retries <= 0) {
 						console.error(`Failed all download attemps for ${image.name} (${image.id})`)
 					}
+					assets.push(image.name)
 				} catch (e) {
 					console.error(e)
-					console.log(`Could not download ${image.name} (${image.id})`)
+					console.error(`Could not download ${image.name} (${image.id})`)
 				}
 			}
 		} catch (e) {
@@ -85,19 +112,59 @@ const googleDrive = (opts) => {
 			})
 		}
 
-		// next, attempt to clean up any images that were deleted in cloud
-		let cloudFiles = images.map(i => i.name)
+		// we also need to convert .heic --> .jpeg and .mov --> .gif
 		for (let f of localFiles) {
-			if (!cloudFiles.includes(f)) {
-				console.log(`Removing ${f}`)
-				await rmPromise(path.join(__dirname, 'images', f))
+			if (f.endsWith('.heic')) {
+				console.log(`Converting ${f} to .jpeg`)
+				try {
+					let inputBuffer = await readFilePromise(path.join(__dirname, 'images', f))
+					const outputBuffer = await convert({
+						buffer: inputBuffer,
+						format: 'JPEG',
+						quality: 1
+					})
+					let filename = f.split('.').slice(0, -1).join('.') + '.jpeg'
+					await writeFilePromise(path.join(__dirname, 'images', filename), outputBuffer)
+					console.log(`Removing ${f}`)
+					await rmPromise(path.join(__dirname, 'images', f))
+					assets.push(filename)
+				} catch (e) {
+					console.error(e)
+					console.error(`Could not convert ${f} to .jpeg`)
+				}
+			} else if (f.endsWith('.mov')) {
+				console.log(`Converting ${f} to .gif`)
+				try {
+					let filename = f.split('.').slice(0, -1).join('.') + '.gif'
+					let inputPath = path.join(__dirname, 'images', f)
+					let outputPath = path.join(__dirname, 'images', filename)
+					let { stdout, stderr } = await execPromise(`ffmpeg -i ${inputPath} ${outputPath}`)
+					console.log(`Removing ${f}`)
+					await rmPromise(path.join(__dirname, 'images', f))
+					assets.push(filename)
+				} catch (e) {
+					console.error(e)
+					console.error(`Could not convert ${f} to .gif`)
+				}
 			}
 		}
 
-		// finally, report back list of IDs so they can be served as static files
+		// filter proper assets
+		const SUPPORTED_TYPES = ['.apng', '.avif', '.gif', '.jpg', '.jpeg', '.jfif', '.pjpeg', '.pjp', '.png', '.svg', '.webp']
+		assets = assets.filter(a => {
+			let ext = '.' + a.split('.').splice(-1, 1)
+			console.log(a)
+			if (!SUPPORTED_TYPES.includes(ext.toLowerCase())) {
+				return false
+			}
+			return true
+		})
+		
+		// TODO: add file cleanup step
+		// report back list of IDs so they can be served as static files
 		next({
 			status: 200,
-			files: cloudFiles.map(cf => `images/${cf}`)
+			data: assets.map(a => {return {path: `images/${a}`, name: a.split('.').slice(0, -1).join('.')}})
 		})
 	})
 

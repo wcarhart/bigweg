@@ -10,26 +10,35 @@
 		const init = async () => {
 
 			// get image URLs from backend service
-			const getImageUrls = async () => {
+			const getImages = async () => {
 				let res = await fetch('/refresh', {method: 'POST'})
 				res = await res.json()
-				return res.files
+				return res.data
 			}
 
 			// dynamic add big weg images :)
 			const addElements = async () => {
 				const container = document.getElementById('content')
-				const images = await getImageUrls()
-				for (let [index, image] of images.entries()) {
+				const data = await getImages()
+				for (let [index, image] of data.entries()) {
 					let card = document.createElement('div')
+					let captionDiv = document.createElement('div')
+					let captionText = document.createElement('p')
 					let img = document.createElement('img')
 
 					card.setAttribute('class', 'card border-0')
-					img.setAttribute('src', image)
+					card.setAttribute('class', 'card')
+					captionDiv.setAttribute('class', 'card-body text-center')
+					captionText.setAttribute('class', 'card-text')
+					// captionText.innerHTML = image.name.split('.').slice(0, -1).join('.')
+					captionText.innerHTML = image.name
+					img.setAttribute('src', image.path)
 					img.setAttribute('class', 'weg-img card-img')
 					img.setAttribute('alt', `Dynamically created big weg image ${index}`)
 
+					captionDiv.appendChild(captionText)
 					card.appendChild(img)
+					card.appendChild(captionDiv)
 					container.appendChild(card)
 				}
 			}
@@ -85,6 +94,18 @@
 
 		.card {
 			background-color: #2F242C;
+			max-width: 21rem;
+		}
+
+		.card-body {
+			background-color: #FCFCFC !important;
+		}
+
+		.card-text {
+			width: 100%;
+			max-width: 100%;
+			height: auto;
+			color: #2F242C !important;
 		}
 
 		@media (min-width: 48rem) {

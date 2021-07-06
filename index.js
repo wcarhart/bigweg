@@ -16,8 +16,8 @@ const PORT = 80
 
 const options = {
   PROD: {
-    key: fs.readFileSync('/etc/letsencrypt/live/my_api_url/privkey.pem'),
-    cert: fs.readFileSync('/etc/letsencrypt/live/my_api_url/fullchain.pem'),
+    key: fs.readFileSync('/etc/letsencrypt/live/bigweg.com/privkey.pem'),
+    cert: fs.readFileSync('/etc/letsencrypt/live/bigweg.com/fullchain.pem'),
   },
   DEV: {
     key: fs.readFileSync('key.pem'),

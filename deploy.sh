@@ -11,6 +11,11 @@ sudo su weg
 cd
 sudo apt-get update
 
+# create group with root and weg (Node.js user) as members
+sudo addgroup nodecert
+sudo adduser weg nodecert
+sudo adduser root nodecert
+
 # install node + yarn
 # get NVM from here: https://github.com/nvm-sh/nvm
 nvm --version
@@ -28,7 +33,13 @@ sudo apt-get update
 sudo apt-get install certbot # or, install from https://certbot.eff.org/lets-encrypt/ubuntubionic-nginx.html
 
 # configure SSL
+# tutorial: https://dev.to/omergulen/step-by-step-node-express-ssl-certificate-run-https-server-from-scratch-in-5-steps-5b87
 sudo certbot certonly --standalone
+sudo chgrp nodecert /etc/letsencrypt/live
+sudo chgrp nodecert /etc/letsencrypt/archive
+sudo chmod 710 /etc/letsencrypt/live
+sudo chmod 710 /etc/letsencrypt/archive
+# hint: https://stackoverflow.com/a/54903098/6246128
 
 # open port access for node
 sudo apt-get install libcap2-bin

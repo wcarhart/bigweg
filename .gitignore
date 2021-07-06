@@ -1,6 +1,5 @@
 node_modules/
 credentials.json
 images/
-privatekey.pem
-certrequest.csr
-certificate.pem
+*.pem
+*.csr

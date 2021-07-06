@@ -16,6 +16,9 @@ nvm ls-remote
 nvm install 15.14.0
 npm install --global yarn
 
+# install ffmpeg for video conversions
+sudo apt install ffmpeg
+
 # open port access for node
 sudo apt-get install libcap2-bin
 sudo setcap cap_net_bind_service=+ep `readlink -f \`which node\``
@@ -40,6 +43,18 @@ pm2 save
 sudo systemctl start pm2-weg # if this fails, do `sudo reboot` and rerun this step and then continue
 systemctl status pm2-weg
 # may have to do `pm2 start index.js` again to pull things back up
+
+# to redeploy or update
+pm2 stop index
+# make your changes (e.g. `git pull`)
+pm2 start index
+
+# to verify systemctl service
+sudo systemctl status pm2-weg.service
+sudo journalctl -xe -u pm2-weg.service
+
+# to view application logs
+pm2 logs index
 
 # should probably set up NGINX as reverse proxy: https://www.digitalocean.com/community/tutorials/how-to-set-up-a-node-js-application-for-production-on-ubuntu-20-04
 # need to fix SSL

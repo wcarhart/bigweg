@@ -13,11 +13,9 @@ const gd = require('./googledrive.js')
 
 const PORT = 80
 
-const privateKey = fs.readFileSync('privatekey.pem').toString()
-const certificate = fs.readFileSync('certificate.pem').toString()
-let options = {
-  key: privateKey,
-  cert: certificate
+const options = {
+  key: fs.readFileSync('key.pem'),
+  cert: fs.readFileSync('cert.pem')
 }
 
 // configure express app

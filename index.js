@@ -15,8 +15,14 @@ const gd = require('./googledrive.js')
 const PORT = 80
 
 const options = {
-  key: fs.readFileSync('key.pem'),
-  cert: fs.readFileSync('cert.pem')
+  PROD: {
+    key: fs.readFileSync('/etc/letsencrypt/live/my_api_url/privkey.pem'),
+    cert: fs.readFileSync('/etc/letsencrypt/live/my_api_url/fullchain.pem'),
+  },
+  DEV: {
+    key: fs.readFileSync('key.pem'),
+    cert: fs.readFileSync('cert.pem')
+  }
 }
 
 // configure express app
@@ -70,7 +76,7 @@ app.use((err, req, res, next) => {
 // })
 
 // PROD
-console.log(`bigweg HTTP server listening on port 80`)
+// console.log(`bigweg HTTP server listening on port 80`)
 console.log(`bigweg HTTPS server listening on port 443`)
-http.createServer(app).listen(80)
-https.createServer(options, app).listen(443)
+// http.createServer(app).listen(80)
+https.createServer(options.PROD, app).listen(443)

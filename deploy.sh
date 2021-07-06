@@ -8,6 +8,8 @@ sudo passwd weg
 sudo usermod --shell /bin/bash weg
 sudo usermod -aG sudo weg
 sudo su weg
+cd
+sudo apt-get update
 
 # install node + yarn
 # get NVM from here: https://github.com/nvm-sh/nvm
@@ -18,6 +20,15 @@ npm install --global yarn
 
 # install ffmpeg for video conversions
 sudo apt install ffmpeg
+
+# set up dependencies for SSL
+sudo apt-get install software-properties-common
+sudo add-apt-repository universe
+sudo apt-get update
+sudo apt-get install certbot # or, install from https://certbot.eff.org/lets-encrypt/ubuntubionic-nginx.html
+
+# configure SSL
+sudo certbot certonly --standalone
 
 # open port access for node
 sudo apt-get install libcap2-bin
@@ -31,7 +42,7 @@ mkdir images
 ./ssl.sh
 yarn install
 # get credentials.json from GCP
-node index.js # should run app
+node index.js # should run app, ^C to exit
 
 # set up service
 npm install pm2@latest -g
@@ -43,19 +54,20 @@ pm2 save
 sudo systemctl start pm2-weg # if this fails, do `sudo reboot` and rerun this step and then continue
 systemctl status pm2-weg
 # may have to do `pm2 start index.js` again to pull things back up
+pm2 restart index --name weg
+pm2 save
 
 # to redeploy or update
-pm2 stop index
+pm2 stop weg
 # make your changes (e.g. `git pull`)
-pm2 start index
+pm2 start weg
 
 # to verify systemctl service
 sudo systemctl status pm2-weg.service
 sudo journalctl -xe -u pm2-weg.service
 
 # to view application logs
-pm2 logs index
+pm2 logs weg
 
-# should probably set up NGINX as reverse proxy: https://www.digitalocean.com/community/tutorials/how-to-set-up-a-node-js-application-for-production-on-ubuntu-20-04
 # need to fix SSL
 # don't forget to configure DNS

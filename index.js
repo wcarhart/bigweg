@@ -53,7 +53,8 @@ app.get('/', express.static(path.join(__dirname, 'public')))
 app.get('/favicon.png', express.static(path.join(__dirname, 'public')))
 
 // download images from Google Drive
-app.use('/refresh', gd())
+app.use('/refresh', gd.ImageCache())
+app.use('/clean', gd.Cleaner())
 
 // log middleware errors
 app.use((err, req, res, next) => {

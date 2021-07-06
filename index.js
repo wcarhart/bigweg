@@ -80,7 +80,8 @@ https.createServer(options.PROD, app).listen(options.PROD.port)
 
 // enforce HTTPS
 let http = express()
-http.get('*', function(req, res) {  
-    res.redirect('https://' + req.headers.host + req.url);
+http.get('*', (req, res) => {
+  console.log(`Redirecting ${req.headers.host + req.url}`)
+  res.redirect('https://' + req.headers.host + req.url);
 })
-http.listen(options.DEV.port)
+http.listen(8080)

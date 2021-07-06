@@ -35,11 +35,11 @@ sudo apt-get install certbot # or, install from https://certbot.eff.org/lets-enc
 # configure SSL
 # tutorial: https://dev.to/omergulen/step-by-step-node-express-ssl-certificate-run-https-server-from-scratch-in-5-steps-5b87
 sudo certbot certonly --standalone
-sudo chgrp nodecert /etc/letsencrypt/live
-sudo chgrp nodecert /etc/letsencrypt/archive
-sudo chmod 710 /etc/letsencrypt/live
-sudo chmod 710 /etc/letsencrypt/archive
-# hint: https://stackoverflow.com/a/54903098/6246128
+sudo chgrp -R nodecert /etc/letsencrypt/live
+sudo chgrp -R nodecert /etc/letsencrypt/archive
+sudo chmod -R 750 /etc/letsencrypt/live
+sudo chmod -R 750 /etc/letsencrypt/archive
+# hint (answer and comments): https://stackoverflow.com/a/54903098/6246128
 
 # open port access for node
 sudo apt-get install libcap2-bin
@@ -69,6 +69,7 @@ pm2 restart index --name weg
 pm2 save
 
 # to redeploy or update
+pm2 status weg
 pm2 stop weg
 # make your changes (e.g. `git pull`)
 pm2 start weg

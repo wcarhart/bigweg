@@ -8,6 +8,7 @@ const fetch = require('node-fetch')
 const express = require('express')
 const errorHandler = require('errorhandler')
 const { google } = require('googleapis')
+const helmet = require('helmet')
 
 const gd = require('./googledrive.js')
 
@@ -39,6 +40,9 @@ app.use((req, res, next) => {
   next()
 })
 
+// TODO: enforce HTTPS
+// app.use(helmet())
+
 // log all HTTP routes
 app.use(routeLogger())
 app.use(errorHandler({ dumpExceptions: true, showStack: true }))
@@ -60,7 +64,6 @@ app.use((err, req, res, next) => {
 	res.json(err)
 })
 
-// start app
 // DEV
 // app.listen(PORT, '0.0.0.0', () => {
 // 	console.log(`bigweg server listening on port ${PORT}`)

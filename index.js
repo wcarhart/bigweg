@@ -1,5 +1,4 @@
 const crypto = require('crypto')
-const http = require('http')
 const https = require('https')
 const path = require('path')
 const fs = require('fs')
@@ -12,16 +11,16 @@ const helmet = require('helmet')
 
 const gd = require('./googledrive.js')
 
-const PORT = 80
-
 const options = {
   PROD: {
     key: fs.readFileSync('/etc/letsencrypt/live/bigweg.com/privkey.pem'),
     cert: fs.readFileSync('/etc/letsencrypt/live/bigweg.com/fullchain.pem'),
+    port: 80
   },
   DEV: {
     key: fs.readFileSync('key.pem'),
-    cert: fs.readFileSync('cert.pem')
+    cert: fs.readFileSync('cert.pem'),
+    port: 443
   }
 }
 
@@ -71,12 +70,17 @@ app.use((err, req, res, next) => {
 })
 
 // DEV
-// app.listen(PORT, '0.0.0.0', () => {
-// 	console.log(`bigweg server listening on port ${PORT}`)
+// app.listen(options.DEV.port, '0.0.0.0', () => {
+// 	console.log(`bigweg server listening on port ${options.DEV.port}`)
 // })
 
 // PROD
-// console.log(`bigweg HTTP server listening on port 80`)
 console.log(`bigweg HTTPS server listening on port 443`)
-// http.createServer(app).listen(80)
-https.createServer(options.PROD, app).listen(443)
+https.createServer(options.PROD, app).listen(options.PROD.port)
+
+// enforce HTTPS
+let http = express()
+http.get('*', function(req, res) {  
+    res.redirect('https://' + req.headers.host + req.url);
+})
+http.listen(options.DEV.port)

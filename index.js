@@ -7,7 +7,6 @@ const fetch = require('node-fetch')
 const express = require('express')
 const errorHandler = require('errorhandler')
 const { google } = require('googleapis')
-const helmet = require('helmet')
 
 const gd = require('./googledrive.js')
 
@@ -37,9 +36,6 @@ const routeLogger = () => {
   })
   return router
 }
-
-// security
-app.use(helmet())
 
 // allow cors so can call from another web client
 app.use((req, res, next) => {

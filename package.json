@@ -8,7 +8,6 @@
     "express": "^4.17.1",
     "googleapis": "^80.1.0",
     "heic-convert": "^1.2.4",
-    "helmet": "^4.6.0",
     "node-fetch": "^2.6.1"
   }
 }

@@ -45,9 +45,6 @@ sudo chmod -R 750 /etc/letsencrypt/archive
 sudo apt-get install libcap2-bin
 sudo setcap cap_net_bind_service=+ep `readlink -f \`which node\``
 
-# forward 80 to 8080 to enforce HTTPS
-iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 80 -j REDIRECT --to-port 8080
-
 # set up app
 mkdir ~/code && cd ~/code
 git clone https://github.com/wcarhart/bigweg.git

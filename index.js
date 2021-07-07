@@ -15,12 +15,12 @@ const options = {
   PROD: {
     key: fs.readFileSync('/etc/letsencrypt/live/bigweg.com/privkey.pem'),
     cert: fs.readFileSync('/etc/letsencrypt/live/bigweg.com/fullchain.pem'),
-    port: 80
+    port: 443
   },
   DEV: {
     key: fs.readFileSync('key.pem'),
     cert: fs.readFileSync('cert.pem'),
-    port: 443
+    port: 80
   }
 }
 
@@ -43,12 +43,6 @@ app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*')
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
   next()
-})
-
-// enforce HTTPS
-app.enable('trust proxy')
-app.use((req, res, next) => {
-  req.secure ? next() : res.redirect('https://' + req.headers.host + req.url)
 })
 
 // log all HTTP routes
@@ -78,13 +72,13 @@ app.use((err, req, res, next) => {
 // })
 
 // PROD
-console.log(`bigweg HTTPS server listening on port 443`)
+console.log(`bigweg HTTPS server listening on port ${options.PROD.port}`)
 https.createServer(options.PROD, app).listen(options.PROD.port)
 
 // enforce HTTPS
-// let http = express()
-// http.get('*', (req, res) => {
-//   console.log(`Redirecting ${req.headers.host + req.url}`)
-//   res.redirect('https://' + req.headers.host + req.url);
-// })
-// http.listen(8080)
+let http = express()
+http.get('*', (req, res) => {
+  console.log(`Upgrading http://${req.headers.host + req.url} to https://${req.headers.host + req.url}`)
+  res.redirect('https://' + req.headers.host + req.url);
+})
+http.listen(options.DEV.port)

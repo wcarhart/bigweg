@@ -45,8 +45,11 @@ app.use((req, res, next) => {
   next()
 })
 
-// TODO: enforce HTTPS
-// app.use(helmet())
+// enforce HTTPS
+app.enable('trust proxy')
+app.use((req, res, next) => {
+  req.secure ? next() : res.redirect('https://' + req.headers.host + req.url)
+})
 
 // log all HTTP routes
 app.use(routeLogger())
@@ -79,9 +82,9 @@ console.log(`bigweg HTTPS server listening on port 443`)
 https.createServer(options.PROD, app).listen(options.PROD.port)
 
 // enforce HTTPS
-let http = express()
-http.get('*', (req, res) => {
-  console.log(`Redirecting ${req.headers.host + req.url}`)
-  res.redirect('https://' + req.headers.host + req.url);
-})
-http.listen(8080)
+// let http = express()
+// http.get('*', (req, res) => {
+//   console.log(`Redirecting ${req.headers.host + req.url}`)
+//   res.redirect('https://' + req.headers.host + req.url);
+// })
+// http.listen(8080)

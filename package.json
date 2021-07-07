@@ -9,5 +9,9 @@
     "googleapis": "^80.1.0",
     "heic-convert": "^1.2.4",
     "node-fetch": "^2.6.1"
+  },
+  "devDependencies": {
+    "eslint": "^7.30.0",
+    "eslint-config-google": "^0.14.0"
   }
 }

@@ -1,5 +1,4 @@
 const express = require('express')
-const fetch = require('node-fetch')
 const { google } = require('googleapis')
 const convert = require('heic-convert')
 const credentials = require('./credentials.json')
@@ -18,7 +17,7 @@ const execPromise = util.promisify(exec)
 const BIG_WEG_FOLDER_ID = '1EnEJ1P2kqEjbFChLvIPRp5FUDRyq-C5A'
 const SUPPORTED_TYPES = ['.apng', '.avif', '.gif', '.jpg', '.jpeg', '.jfif', '.pjpeg', '.pjp', '.png', '.svg', '.webp']
 
-const ImageCache = (opts) => {
+const ImageCache = () => {
 	const router = express.Router()
 
 	// configure GDrive auth
@@ -27,7 +26,7 @@ const ImageCache = (opts) => {
 		credentials.client_email, null,
 		credentials.private_key, scopes
 	)
-	const drive = google.drive({ version: "v3", auth })
+	const drive = google.drive({ version: 'v3', auth })
 
 	router.post('/', async (req, res, next) => {
 		// first, list files in public Drive folder
@@ -140,7 +139,7 @@ const ImageCache = (opts) => {
 					let filename = f.split('.').slice(0, -1).join('.') + '.gif'
 					let inputPath = path.join(__dirname, 'images', f)
 					let outputPath = path.join(__dirname, 'images', filename)
-					let { stdout, stderr } = await execPromise(`ffmpeg -i "${inputPath}" "${outputPath}"`)
+					await execPromise(`ffmpeg -i "${inputPath}" "${outputPath}"`)
 					assets.push(filename)
 				} catch (e) {
 					console.error(e)
@@ -178,7 +177,7 @@ const ImageCache = (opts) => {
 	return router
 }
 
-const Cleaner = (opts) => {
+const Cleaner = () => {
 	const router = express.Router()
 	router.post('/', async (req, res, next) => {
 		console.log('in cleanup step')
@@ -189,7 +188,7 @@ const Cleaner = (opts) => {
 			credentials.client_email, null,
 			credentials.private_key, scopes
 		)
-		const drive = google.drive({ version: "v3", auth })
+		const drive = google.drive({ version: 'v3', auth })
 
 		// check for list of cloud images
 		let images = []

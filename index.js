@@ -38,6 +38,9 @@ const routeLogger = () => {
   return router
 }
 
+// security
+app.use(helmet())
+
 // allow cors so can call from another web client
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*')
